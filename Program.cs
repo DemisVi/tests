@@ -1,30 +1,44 @@
-﻿using System;
+﻿using System.Text.Json;
 
-Devs devs = new(new Dev("0 asdf"));
-devs.Add(new Dev("1 zxcv"));
-devs.AddRange(new[] {new Dev("2 qweqwe"), new("3 zzxcvzxcv"), new("4 zzxcvzxcv")});
+var str = ConfigHelper.Token;
+System.Console.WriteLine(str);
+ConfigHelper.Users?.Add("qweqweqwe", "123123123123");
+ConfigHelper.Save();
 
-foreach (var d in devs)
-    System.Console.WriteLine(d);
-
-
-public class Devs : List<Dev>
+public static class ConfigHelper
 {
-    public string Name { get; private set; }
-    public Devs(string name = "") => Name = name;
-
-    public Devs(Dev dev, string name = "")
+    private static Config config;
+    public static string Token => config.Token;
+    public static Dictionary<string, string>? Users => config.Users;
+    static ConfigHelper()
     {
-        Add(dev);
-        Name = name;
+        if (File.Exists("config.json"))
+        {
+            System.Console.WriteLine("read config.json");
+            using var fileStream = File.OpenRead("config.json");
+            config = JsonSerializer.Deserialize<Config>(fileStream);
+        }
+        else
+        {
+            System.Console.WriteLine("create config.json");
+            config = new Config();
+            ConfigHelper.Save(config);
+        }
     }
+
+    private static void Save(Config config)
+    {
+        System.Console.WriteLine("save config.json");
+        using var fileStream = File.OpenWrite("config.json");
+        JsonSerializer.Serialize(fileStream, config);
+    }
+    public static void Save() => Save(config);
 }
 
-public class Dev
+public struct Config
 {
-    public string Name { get; private set; } = string.Empty;
-    
-    public Dev(string name) => Name = name;
+    public string Token { get; set; } = "string";
+    public Dictionary<string, string>? Users { get; set; } = new();
 
-    public override string ToString() => Name.ToString();
+    public Config() { }
 }
