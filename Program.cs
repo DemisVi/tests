@@ -2,43 +2,77 @@
 
 var str = ConfigHelper.Token;
 System.Console.WriteLine(str);
-ConfigHelper.Users?.Add("qweqweqwe", "123123123123");
-ConfigHelper.Save();
+// ConfigHelper.AddUser("123123123123");
+// ConfigHelper.Save();
 
 public static class ConfigHelper
 {
     private static Config config;
     public static string Token => config.Token;
-    public static Dictionary<string, string>? Users => config.Users;
+    public static List<string> Users => config.Users;
     static ConfigHelper()
     {
-        if (File.Exists("config.json"))
+        try
         {
-            System.Console.WriteLine("read config.json");
             using var fileStream = File.OpenRead("config.json");
             config = JsonSerializer.Deserialize<Config>(fileStream);
         }
-        else
+        catch (Exception ex)
         {
-            System.Console.WriteLine("create config.json");
+            config = ex switch
+            {
+                JsonException => ReadAsLine(),
+                FileNotFoundException => CreateBlankConfig(),
+                _ => throw new Exception("Can't read or create config.json")
+            };
+        }
+
+        static Config ReadAsLine()
+        {
+            try
+            {
+                var line = File.ReadAllLines("./config.json")[0].Trim('"');
+
+                config = new Config(line);
+                Save();
+
+                return config;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return CreateBlankConfig();
+            }
+        }
+
+        static Config CreateBlankConfig()
+        {
             config = new Config();
-            ConfigHelper.Save(config);
+            Save();
+            return config;
         }
     }
 
     private static void Save(Config config)
     {
-        System.Console.WriteLine("save config.json");
         using var fileStream = File.OpenWrite("config.json");
         JsonSerializer.Serialize(fileStream, config);
     }
     public static void Save() => Save(config);
-}
 
-public struct Config
-{
-    public string Token { get; set; } = "string";
-    public Dictionary<string, string>? Users { get; set; } = new();
+    public static void AddUser(string id)
+    {
+        if (!Users.Contains(id))
+        {
+            Users.Add(id);
+        }
+    }
 
-    public Config() { }
+    private struct Config
+    {
+        public string Token { get; set; } = string.Empty;
+        public List<string> Users { get; set; } = new();
+
+        public Config(string token) => Token = token;
+        public Config() => Token = "token";
+    }
 }
