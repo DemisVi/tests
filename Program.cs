@@ -1,23 +1,55 @@
-﻿using var source = File.OpenRead("./Program.cs");
-using var destination = File.Create("./out");
+﻿using System;
+using System.Buffers;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
-await TransferSymbols(source, destination);
-
-static async Task TransferSymbols(Stream source, Stream destination)
-{   
-    var buffer = new byte[source.Length];
-
-    var charCount = 0;
-
-    await source.ReadAsync(buffer, 0, buffer.Length);
-
-    foreach (char i in buffer)
+namespace ConsoleSandbox
+{
+    sealed class Program
     {
-        if (char.IsLetter(i) && char.IsLower(i))
+        private const int MinBufferSize = 2014;
+
+        static async Task<long> CountSymbols(Stream source, Thread reference)
         {
-            buffer[charCount] = Convert.ToByte(i);
-            charCount++;
+            Console.Write( ReferenceEquals(Thread.CurrentThread, reference) ? "same " : "other" );
+
+            var count = 0L;
+
+            var buffer = ArrayPool<byte>.Shared.Rent(MinBufferSize);
+            try
+            {
+                while (true)
+                {
+                    var bytesRead = await source.ReadAsync(buffer, 0, buffer.Length);
+
+                    if (0 == bytesRead)
+                    {
+                        break;
+                    }
+
+                    count += bytesRead;
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
+
+            Console.Write( ReferenceEquals(Thread.CurrentThread, reference) ? "same " : "other" );
+
+            return count;
+        }
+
+        static void Main()
+        {
+            var thisAssemblyFilePath = new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path;
+
+            using (var assembly = new MemoryStream(new byte[31]))
+            {
+                CountSymbols(assembly, Thread.CurrentThread).Wait();
+            }
         }
     }
-    await destination.WriteAsync(buffer, 0, charCount);
 }
