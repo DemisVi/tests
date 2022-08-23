@@ -1,17 +1,23 @@
-﻿int MAX = int.Parse(args[0]);
+﻿using var source = File.OpenRead("./Program.cs");
+using var destination = File.Create("./out");
 
-for (int i = 0; i < MAX; i++)
-{
-    for (int j = 0; j < MAX; j++)
+await TransferSymbols(source, destination);
+
+static async Task TransferSymbols(Stream source, Stream destination)
+{   
+    var buffer = new byte[source.Length];
+
+    var charCount = 0;
+
+    await source.ReadAsync(buffer, 0, buffer.Length);
+
+    foreach (char i in buffer)
     {
-        System.Console.Write(GetSymbol(i, j, MAX));
+        if (char.IsLetter(i) && char.IsLower(i))
+        {
+            buffer[charCount] = Convert.ToByte(i);
+            charCount++;
+        }
     }
-    System.Console.WriteLine();
-}
-
-char GetSymbol(int i, int j, int mAX)
-{
-    return i == j || i == mAX - 1 - j ||
-           i == 0 || i == mAX - 1 ||
-           j == 0 || j == mAX - 1 ? '#' : ' ';
+    await destination.WriteAsync(buffer, 0, charCount);
 }
