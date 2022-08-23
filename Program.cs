@@ -46,7 +46,7 @@ namespace ConsoleSandbox
         {
             var thisAssemblyFilePath = new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path;
 
-            using (var assembly = new MemoryStream(new byte[31]))
+            using (var assembly = new FileStream(thisAssemblyFilePath, FileMode.Open, FileAccess.Read))
             {
                 CountSymbols(assembly, Thread.CurrentThread).Wait();
             }
