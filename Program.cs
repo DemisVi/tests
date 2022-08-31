@@ -1,10 +1,27 @@
 ﻿using System;
-using System.Text;
-using System.Security.Cryptography;
+using System.Reflection;
 
-using var sha1 = SHA1.Create();
+C c = new();
 
-var hash = sha1.ComputeHash(Encoding.Unicode.GetBytes("12345"));
+var attr = c.GetType().GetCustomAttributes();
 
-foreach (var i in hash)
-    System.Console.Write("{0,-4:X2}", i);
+foreach (var i in attr)
+{
+    System.Console.WriteLine(i.GetType().Name);
+}
+
+[MyAttrib("123123123"), Serializable]
+public class C
+{
+    private int I { get; set; }
+    public int PI { get; set; }
+
+    private int fI = 0;
+    public int pfI = 0;
+}
+
+public class MyAttrib : Attribute
+{
+    public MyAttrib(string name) => Name = name;
+    public string Name { get; set; }
+}
