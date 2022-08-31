@@ -1,27 +1,74 @@
 ﻿using System;
 using System.Reflection;
 
-C c = new();
-
-var attr = c.GetType().GetCustomAttributes();
-
-foreach (var i in attr)
+// An enumeration of animals. Start at 1 (0 = uninitialized).
+public enum Animal
 {
-    System.Console.WriteLine(i.GetType().Name);
+    // Pets.
+    Dog = 1,
+    Cat,
+    Bird,
 }
 
-[MyAttrib("123123123"), Serializable]
-public class C
+// A custom attribute to allow a target to have a pet.
+public class AnimalTypeAttribute : Attribute
 {
-    private int I { get; set; }
-    public int PI { get; set; }
+    // The constructor is called when the attribute is set.
+    public AnimalTypeAttribute(Animal pet)
+    {
+        thePet = pet;
+    }
 
-    private int fI = 0;
-    public int pfI = 0;
+    // Keep a variable internally ...
+    protected Animal thePet;
+
+    // .. and show a copy to the outside world.
+    public Animal Pet
+    {
+        get { return thePet; }
+        set { thePet = value; }
+    }
 }
 
-public class MyAttrib : Attribute
+// A test class where each method has its own pet.
+class AnimalTypeTestClass
 {
-    public MyAttrib(string name) => Name = name;
-    public string Name { get; set; }
+    [AnimalType(Animal.Dog)]
+    public void DogMethod() { }
+
+    [AnimalType(Animal.Cat)]
+    public void CatMethod() { }
+
+    [AnimalType(Animal.Bird)]
+    public void BirdMethod() { }
 }
+
+class DemoClass
+{
+    static void Main(string[] args)
+    {
+        var testClass = new AnimalTypeTestClass();
+        Type type = testClass.GetType();
+
+        // Iterate through all the methods of the class.
+        foreach (MethodInfo methodInfo in type.GetMethods())
+        {
+
+            // Iterate through all the Attributes for each method.
+            foreach (var attribute in Attribute.GetCustomAttributes(methodInfo))
+            {
+
+                // Check for the AnimalType attribute.
+                if (attribute.GetType() == typeof(AnimalTypeAttribute))
+                    Console.WriteLine("Method {0} has a pet {1} attribute.",
+                        methodInfo.Name, ((AnimalTypeAttribute)attribute).Pet);
+            }
+        }
+    }
+}
+/*
+ * Output:
+ * Method DogMethod has a pet Dog attribute.
+ * Method CatMethod has a pet Cat attribute.
+ * Method BirdMethod has a pet Bird attribute.
+ */
