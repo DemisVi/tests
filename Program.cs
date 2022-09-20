@@ -1,22 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Threading;
+using System.IO;
 
-var a = Matrix.FillRandom(5, 3);
-var b = Matrix.FillRandom(1, 5);
-
-/* ThreadedSolve(a, b, 3); */
-Matrix.Print(a);
-foreach (var item in Matrix.GetSegments(a, 3))
-    Matrix.Print(item);
-
-
-void ThreadedSolve(int[,] matrixa, int[,] matrixb, int numberOfThreads = 1)
+static class Prog
 {
-    var matrixc = new int[matrixa.GetLength(0), matrixb.GetLength(1)];
-    var actualThreadCount = numberOfThreads < matrixa.GetLength(0) ? numberOfThreads : matrixa.GetLength(0);
+    static void Main()
+    {
+        var fileLister = new FileSearcher();
+        int filesFound = 0;
 
-    System.Console.WriteLine(matrixc.GetLength(0) + " " + matrixc.GetLength(1) + " " + actualThreadCount);
+        EventHandler<FileFoundArgs> onFileFound = (sender, eventArgs) =>
+        {
+            Console.WriteLine(eventArgs.FoundFile);
+            filesFound++;
+        };
+
+        fileLister.FileFound += onFileFound;
+
+        fileLister.Search(Directory.GetCurrentDirectory(), "*");
+    }
 }
 
+public class FileFoundArgs : EventArgs
+{
+    public string FoundFile { get; }
+
+    public FileFoundArgs(string fileName) => FoundFile = fileName;
+}
+
+public class FileSearcher
+{
+    public event EventHandler<FileFoundArgs> FileFound;
+
+    public void Search(string directory, string searchPattern)
+    {
+        foreach (var file in Directory.EnumerateFiles(directory, searchPattern, new EnumerationOptions() { RecurseSubdirectories = true }))
+        {
+            RaiseFileFound(file);
+        }
+    }
+
+    private void RaiseFileFound(string file) =>
+        FileFound?.Invoke(this, new FileFoundArgs(file));
+}
