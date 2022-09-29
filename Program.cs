@@ -1,52 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Timers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 try
 {
-    new ConverterTests().Basic_Tests();
+    new SolutionTest().SampleTest();
 }
 catch (System.Exception ex)
 {
     System.Console.WriteLine(ex.Message);
 }
 
-[TestFixture]
-public class ConverterTests
+public static class Kata
 {
-    [Test]
-    public void Basic_Tests()
+    public static string AlphabetPosition(string text)
     {
-        Assert.AreEqual("", Kata.BinaryToString(""));
-        Assert.AreEqual("Hello", Kata.BinaryToString("0100100001100101011011000110110001101111"));
+        var chars = new List<int>();
+
+        foreach (var c in text)
+            chars.Add(char.IsLetter(c) ? char.IsLower(c) ? (c - '`') : (c - '@') : 0);
+
+        return string.Join(' ', chars.Where(x => x != 0));
     }
 }
 
-public static class Kata
+[TestFixture]
+public class SolutionTest
 {
-    public static string BinaryToString(string binary)
+    [Test]
+    public void SampleTest()
     {
-        if (string.IsNullOrEmpty(binary)) return string.Empty;
-
-        var sb = new StringBuilder();
-        var stringLength = binary.Length % 8 == 0 ? binary.Length / 8 : binary.Length / 8 + 1;
-        var bytes = new byte[stringLength];
-        var counter = 0;
-
-        foreach (var i in binary.Chunk(8))
-        {
-            var tempString = new string(i);
-            bytes[counter++] = Convert.ToByte(tempString, 2);
-        }
-    
-        sb.Append(Encoding.ASCII.GetChars(bytes));
-
-        return sb.ToString();
+        Assert.AreEqual("20 8 5 19 21 14 19 5 20 19 5 20 19 1 20 20 23 5 12 22 5 15 3 12 15 3 11", Kata.AlphabetPosition("The sunset sets at twelve o' clock."));
+        Assert.AreEqual("20 8 5 14 1 18 23 8 1 12 2 1 3 15 14 19 1 20 13 9 4 14 9 7 8 20", Kata.AlphabetPosition("The narwhal bacons at midnight."));
     }
 }
