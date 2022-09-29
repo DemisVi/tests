@@ -11,43 +11,46 @@ using NUnit.Framework;
 
 try
 {
-    new Tests().SimpleTest();
+    new KataTests().BasicTests();
 }
 catch (System.Exception ex)
 {
     System.Console.WriteLine(ex.Message);
 }
 
-
-public class CodeWars
+public class Kata
 {
-    public static string crack(string hash)
+    public static int[] SortArray(int[] array)
     {
-        using var crypt = MD5.Create();
-        hash = hash.ToUpper();
-
-        for (var num = 0; num < 100000; num++)
+        for (var i = 0; i < array.Length; i++)
         {
-            var hashBytes = crypt.ComputeHash(Encoding.ASCII.GetBytes(num.ToString("D5")));
-            var stringToCompare = string.Join("", hashBytes.Select(x => x.ToString("X2")));
+            if (array[i] % 2 == 0) continue;
 
-            if (stringToCompare == hash)
-            {
-                System.Console.WriteLine(num.ToString("D5"));
-                return num.ToString("D5");
-            }
+            for (var j = i + 1; j < array.Length; j++)
+                if (array[j] % 2 != 0)
+                    if (array[i] > array[j])
+                        Swap(ref array[i], ref array[j]);
         }
-        return "There is no PIN";
+
+        return array;
+
+        void Swap(ref int a, ref int b)
+        {
+            b ^= a;
+            a ^= b;
+            b ^= a;
+        }
     }
 }
 
 [TestFixture]
-public class Tests
+public class KataTests
 {
     [Test]
-    public void SimpleTest()
+    public void BasicTests()
     {
-        Assert.AreEqual("12345", CodeWars.crack("827ccb0eea8a706c4c34a16891f84e7b"));
-        Assert.AreEqual("00078", CodeWars.crack("86aa400b65433b608a9db30070ec60cd"));
+        Assert.AreEqual(new int[] { 1, 3, 2, 8, 5, 4 }, Kata.SortArray(new int[] { 5, 3, 2, 8, 1, 4 }));
+        Assert.AreEqual(new int[] { 1, 3, 5, 8, 0 }, Kata.SortArray(new int[] { 5, 3, 1, 8, 0 }));
+        Assert.AreEqual(new int[] { }, Kata.SortArray(new int[] { }));
     }
 }
