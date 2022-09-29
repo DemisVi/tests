@@ -1,44 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Timers;
+using System.Threading;
+using System.Threading.Tasks;
 using System.IO;
+using NUnit.Framework;
 
-static class Prog
+try
 {
-    static void Main()
+    new ConverterTests().Basic_Tests();
+}
+catch (System.Exception ex)
+{
+    System.Console.WriteLine(ex.Message);
+}
+
+[TestFixture]
+public class ConverterTests
+{
+    [Test]
+    public void Basic_Tests()
     {
-        var fileLister = new FileSearcher();
-        int filesFound = 0;
-
-        EventHandler<FileFoundArgs> onFileFound = (sender, eventArgs) =>
-        {
-            Console.WriteLine(eventArgs.FoundFile);
-            filesFound++;
-        };
-
-        fileLister.FileFound += onFileFound;
-
-        fileLister.Search(Directory.GetCurrentDirectory(), "*");
+        Assert.AreEqual("", Kata.BinaryToString(""));
+        Assert.AreEqual("Hello", Kata.BinaryToString("0100100001100101011011000110110001101111"));
     }
 }
 
-public class FileFoundArgs : EventArgs
+public static class Kata
 {
-    public string FoundFile { get; }
-
-    public FileFoundArgs(string fileName) => FoundFile = fileName;
-}
-
-public class FileSearcher
-{
-    public event EventHandler<FileFoundArgs> FileFound;
-
-    public void Search(string directory, string searchPattern)
+    public static string BinaryToString(string binary)
     {
-        foreach (var file in Directory.EnumerateFiles(directory, searchPattern, new EnumerationOptions() { RecurseSubdirectories = true }))
+        if (string.IsNullOrEmpty(binary)) return string.Empty;
+
+        var sb = new StringBuilder();
+        var stringLength = binary.Length % 8 == 0 ? binary.Length / 8 : binary.Length / 8 + 1;
+        var bytes = new byte[stringLength];
+        var counter = 0;
+
+        foreach (var i in binary.Chunk(8))
         {
-            RaiseFileFound(file);
+            var tempString = new string(i);
+            bytes[counter++] = Convert.ToByte(tempString, 2);
         }
-    }
+    
+        sb.Append(Encoding.ASCII.GetChars(bytes));
 
-    private void RaiseFileFound(string file) =>
-        FileFound?.Invoke(this, new FileFoundArgs(file));
+        return sb.ToString();
+    }
 }
