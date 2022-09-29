@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -10,33 +11,43 @@ using NUnit.Framework;
 
 try
 {
-    new SolutionTest().SampleTest();
+    new Tests().SimpleTest();
 }
 catch (System.Exception ex)
 {
     System.Console.WriteLine(ex.Message);
 }
 
-public static class Kata
+
+public class CodeWars
 {
-    public static string AlphabetPosition(string text)
+    public static string crack(string hash)
     {
-        var chars = new List<int>();
+        using var crypt = MD5.Create();
+        hash = hash.ToUpper();
 
-        foreach (var c in text)
-            chars.Add(char.IsLetter(c) ? char.IsLower(c) ? (c - '`') : (c - '@') : 0);
+        for (var num = 0; num < 100000; num++)
+        {
+            var hashBytes = crypt.ComputeHash(Encoding.ASCII.GetBytes(num.ToString("D5")));
+            var stringToCompare = string.Join("", hashBytes.Select(x => x.ToString("X2")));
 
-        return string.Join(' ', chars.Where(x => x != 0));
+            if (stringToCompare == hash)
+            {
+                System.Console.WriteLine(num.ToString("D5"));
+                return num.ToString("D5");
+            }
+        }
+        return "There is no PIN";
     }
 }
 
 [TestFixture]
-public class SolutionTest
+public class Tests
 {
     [Test]
-    public void SampleTest()
+    public void SimpleTest()
     {
-        Assert.AreEqual("20 8 5 19 21 14 19 5 20 19 5 20 19 1 20 20 23 5 12 22 5 15 3 12 15 3 11", Kata.AlphabetPosition("The sunset sets at twelve o' clock."));
-        Assert.AreEqual("20 8 5 14 1 18 23 8 1 12 2 1 3 15 14 19 1 20 13 9 4 14 9 7 8 20", Kata.AlphabetPosition("The narwhal bacons at midnight."));
+        Assert.AreEqual("12345", CodeWars.crack("827ccb0eea8a706c4c34a16891f84e7b"));
+        Assert.AreEqual("00078", CodeWars.crack("86aa400b65433b608a9db30070ec60cd"));
     }
 }
