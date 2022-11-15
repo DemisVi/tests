@@ -2589,13 +2589,13 @@ namespace FTD2XX_NET
                         fT_STATUS = tFT_GetDeviceInfoDetail(num2, ref devicelist[num2].Flags, ref devicelist[num2].Type, ref devicelist[num2].ID, ref devicelist[num2].LocId, array, array2, ref devicelist[num2].ftHandle);
                         devicelist[num2].SerialNumber = Encoding.ASCII.GetString(array);
                         devicelist[num2].Description = Encoding.ASCII.GetString(array2);
-                        num = devicelist[num2].SerialNumber.IndexOf('\0');
+                        num = devicelist[num2].SerialNumber.IndexOf("\0", StringComparison.Ordinal);
                         if (num != -1)
                         {
                             devicelist[num2].SerialNumber = devicelist[num2].SerialNumber.Substring(0, num);
                         }
 
-                        num = devicelist[num2].Description.IndexOf('\0');
+                        num = devicelist[num2].Description.IndexOf("\0", StringComparison.Ordinal);
                         if (num != -1)
                         {
                             devicelist[num2].Description = devicelist[num2].Description.Substring(0, num);
