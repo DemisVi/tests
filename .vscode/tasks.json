@@ -7,7 +7,11 @@
             "type": "process",
             "args": [
                 "build",
+<<<<<<< HEAD
                 "${workspaceFolder}/tests.csproj",
+=======
+                "${workspaceFolder}/test.csproj",
+>>>>>>> 5fe246c (WQL queries)
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +23,12 @@
             "type": "process",
             "args": [
                 "publish",
+<<<<<<< HEAD
                 "${workspaceFolder}/tests.csproj",
+=======
+                "-c:release",
+                "${workspaceFolder}/test.csproj",
+>>>>>>> 5fe246c (WQL queries)
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +42,11 @@
                 "watch",
                 "run",
                 "--project",
+<<<<<<< HEAD
                 "${workspaceFolder}/tests.csproj"
+=======
+                "${workspaceFolder}/test.csproj"
+>>>>>>> 5fe246c (WQL queries)
             ],
             "problemMatcher": "$msCompile"
         }
