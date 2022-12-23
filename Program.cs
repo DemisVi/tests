@@ -2,8 +2,31 @@
 using System.Text;
 using System.Linq;
 
+var fac = new FactoryCFG("C:\\Users\\lyuds\\Code\\test\\");
+fac.ReadFactory();
+System.Console.WriteLine(fac["serial_number"]);
 
+public class FactoryCFG
+{
+    private const string _baseName = "factory.cfg";
+    private readonly string _path;
 
+    private Dictionary<string, string> _factory = new();
+
+    public FactoryCFG(string path = "./") => _path = Path.Combine(path, _baseName);
+
+    public void ReadFactory()
+    {
+        var lines = File.ReadAllLines(_path);
+        foreach (var l in lines)
+        {
+            var temp = l.Split('=');
+            _factory.Add(temp.First(), temp.Last());
+        }
+    }
+
+    public string this[string parameter] => _factory[parameter];
+}
 
 public class Base34
 {
