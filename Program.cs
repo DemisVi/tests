@@ -1,49 +1,50 @@
 ﻿using System;
-using System.Text.Json;
+using System.Text;
 using System.Linq;
-using System.Management;
-using System.Diagnostics;
-using System.IO.Ports;
-using System.Timers;
 
-#pragma warning disable CA1416 // Disable platform compatibility warning
 
-WqlEventQuery queryEventTelit = new WqlEventQuery(
-                    "SELECT * FROM __InstanceCreationEvent " + "WITHIN 1 WHERE " +
-                    "TargetInstance ISA 'Win32_POTSModem' " +
-                    "AND (TargetInstance.Caption LIKE '%Telit%' " +
-                    "OR TargetInstance.ProviderName LIKE '%Telit%' " +
-                    "OR TargetInstance.DeviceID LIKE '%VID_1BC7&PID_1201%') " +
-                    "GROUP WITHIN 4");
 
-WqlEventQuery queryEventDevice = new WqlEventQuery("SELECT * FROM Win32_DeviceChangeEvent" +
-                    " WHERE EventType = 2 GROUP WITHIN 4");
 
-ObjectQuery queryTelitModem = new WqlObjectQuery("SELECT AttachedTo FROM Win32_POTSModem WHERE" +
-                    " DeviceID LIKE '%VID_1BC7&PID_1201%'");
-
-ManagementEventWatcher watcher1 = new ManagementEventWatcher(queryEventTelit);
-Console.WriteLine("Waiting for an event...");
-
-int eventCount = 0;
-
-watcher1.EventArrived += new EventArrivedEventHandler(ResolveEvent);
-
-watcher1.Start();
-
-Console.CancelKeyPress += (_, _) =>
+public class Base34
 {
-    watcher1.Stop();
-};
-
-Thread.Sleep(Timeout.Infinite);
-
-void ResolveEvent(object? obj, EventArrivedEventArgs e)
+    private static readonly char[] base34 = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+    public static char[] Base => base34;
+}
+public static class Base34Extensions
 {
-    Console.WriteLine($"{eventCount++}: " + DateTime.Now.ToString("HH:mm:ss") + " >");
+    public static int ToInt32(this char value) => ToInt32(value.ToString());
+    public static int ToInt32(this string value)
+    {
+        var serial = value.ToUpper().Reverse();
+        int integer = 0;
+        int power = 1;
 
-    using var searcher = new ManagementObjectSearcher(queryTelitModem);
+        foreach (var c in serial)
+        {
+            int index = Array.IndexOf(Base34.Base, c);
 
-    foreach (ManagementObject queryObj in searcher.Get())
-        System.Console.WriteLine(queryObj["AttachedTo"]);
+            if (index == -1) throw new ArgumentException("Not a base-34 string");
+
+            integer += index * power;
+            power *= 34;
+        }
+        return integer;
+    }
+
+    public static string ToBase34(this int value, int rank = 0)
+    {
+        StringBuilder result = new();
+        int targetBase = (int)Base34.Base.Length;
+
+        do
+        {
+            result.Insert(0, Base34.Base[value % targetBase]);
+            value = value / targetBase;
+        }
+        while (value > 0);
+
+        if (rank > 0) result.Insert(0, "0", rank);
+
+        return result.ToString();
+    }
 }
