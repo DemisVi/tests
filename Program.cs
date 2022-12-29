@@ -1,16 +1,38 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 
-var fac = new FactoryCFG("./");
-fac.ReadFactory();
-while (true)
+System.Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(), null, null, "Data"));
+
+void GoDirectory()
 {
-    fac.SerialNumber++;
-    fac.SaveFactory();
-    Thread.Sleep(1000);
-}
+    var data = new Dictionary<string, List<string>>();
 
+    var datadir = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+    System.Console.WriteLine($"{datadir}, {Directory.Exists(datadir)}");
+    var subdirs = new DirectoryInfo(datadir).GetDirectories();
+    foreach (var i in subdirs)
+    {
+        data.Add(i.Name, new List<string>());
+        foreach (var sd in i.GetDirectories())
+        {
+            data[$"{i.Name}"].Add(sd.Name);
+        }
+    }
+
+    foreach (var i in data.Keys)
+        System.Console.WriteLine(i);
+
+    foreach (var i in data.Values)
+    {
+        System.Console.WriteLine(i.GetType().Name);
+        foreach (var j in i)
+            System.Console.WriteLine(j);
+    }
+}
 public class FactoryCFG
 {
     private const string _baseName = "factory.cfg";
