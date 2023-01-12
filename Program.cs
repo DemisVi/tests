@@ -1,11 +1,107 @@
 ﻿using System;
-using System.Text;
-using System.Linq;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
+using System.Text;
+using System.Management;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
-System.Console.WriteLine(Path.Combine(Directory.GetCurrentDirectory(), null, null, "Data"));
+System.Console.WriteLine("L000".ToInt32());
+/*
+#pragma warning disable CA1416
+
+WqlEventQuery creationEventQuery = new WqlEventQuery(
+    "SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE " +
+    "TargetInstance ISA 'Win32_PnPEntity' " +
+    "AND TargetInstance.Caption LIKE '%Telit Serial Diagnostics Interface%'");
+
+WqlEventQuery delevionEventQuery = new WqlEventQuery(
+    "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE " +
+    "TargetInstance ISA 'Win32_PnPEntity' " +
+    "AND TargetInstance.Caption LIKE '%Telit Serial Diagnostics Interface%'");
+
+WqlObjectQuery deviceQuery = new WqlObjectQuery(
+    "SELECT * FROM Win32_PnPEntity WHERE " +
+    "Caption LIKE '%Telit Serial Diagnostics Interface%'");
+
+string WaitForEvent(WqlEventQuery query)
+{
+    using var watcher = new ManagementEventWatcher(query);
+    var deviceMOFtext = watcher.WaitForNextEvent().GetText(TextFormat.Mof);
+    watcher.Stop();     // WMI EventWatcher need to be softly stoped
+    var portName = deviceMOFtext.Split(new char[] { '(', ')' })
+                                .Where(x => x.Contains("COM", StringComparison.OrdinalIgnoreCase)).First();
+    return portName;
+}
+
+string GetDevice(WqlObjectQuery query)
+{
+    using var searcher = new ManagementObjectSearcher(query);
+    var objCollection = searcher.Get();
+    if (objCollection.Count <= 0) return string.Empty;
+    var deviceMOFtext = objCollection.Cast<ManagementObject>().First().GetText(TextFormat.Mof);
+
+    var portName = deviceMOFtext.Split(new char[] { '(', ')' })
+                                .Where(x => x.Contains("COM", StringComparison.OrdinalIgnoreCase)).First();
+    return portName;
+}
+
+#pragma warning restore CA1416
+
+// Testing
+while (true)
+{
+    System.Console.WriteLine(GetDevice(deviceQuery));
+    await Task.Delay(100);
+}
+
+
+var _lock = new object();
+
+var modemPort = new SerialPort("COM5")
+{
+    BaudRate = 115200,
+    // Handshake = Handshake.RequestToSend,
+    DtrEnable = true,
+    StopBits = StopBits.One,
+    Parity = Parity.None,
+    // RtsEnable = true,
+    // NewLine = "\0",
+};
+var virtualCom = new SerialPort("COM111")
+{
+    BaudRate = 115200,
+    // Handshake = Handshake.RequestToSend,
+    DtrEnable = true,
+    StopBits = StopBits.One,
+    Parity = Parity.None,
+    // RtsEnable = true,
+    // NewLine = "\0",
+};
+
+modemPort.Open();
+virtualCom.Open();
+
+modemPort.DataReceived += (s, _) => ProcessData(s, virtualCom, nameof(modemPort));
+virtualCom.DataReceived += (s, _) => ProcessData(s, modemPort, nameof(virtualCom));
+
+modemPort.ErrorReceived += (_, e) => System.Console.WriteLine(e.EventType);
+virtualCom.ErrorReceived += (_, e) => System.Console.WriteLine(e.EventType);
+
+void ProcessData(object obj, SerialPort opositePort, string portName)
+{
+    lock (_lock)
+    {
+        var port = obj as SerialPort;
+        var buff = new byte[port.BytesToRead];
+        // System.Console.Write($"{portName} received: {port?.BaseStream.Read(buff, 0, buff.Length)} bytes. {{{string.Join(", ", buff.Select(x => string.Format($"0x{x:X2}")))}}}");
+        opositePort.BaseStream.Write(buff, 0, buff.Length);
+        // System.Console.WriteLine();
+    }
+}
+
+await Task.Delay(Timeout.Infinite);
 
 void GoDirectory()
 {
@@ -33,6 +129,9 @@ void GoDirectory()
             System.Console.WriteLine(j);
     }
 }
+
+*/
+
 public class FactoryCFG
 {
     private const string _baseName = "factory.cfg";
