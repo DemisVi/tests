@@ -7,8 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-System.Console.WriteLine("L000".ToInt32());
-/*
+
 #pragma warning disable CA1416
 
 WqlEventQuery creationEventQuery = new WqlEventQuery(
@@ -16,14 +15,28 @@ WqlEventQuery creationEventQuery = new WqlEventQuery(
     "TargetInstance ISA 'Win32_PnPEntity' " +
     "AND TargetInstance.Caption LIKE '%Telit Serial Diagnostics Interface%'");
 
+WqlEventQuery creationA73Query = new(
+    "SELECT * FROM __InstanceCreationEvent WITHIN 1 WHERE " +
+    "TargetInstance ISA 'Win32_PnPEntity' " +
+    "AND TargetInstance.ClassGuid = '{eec5ad98-8080-425f-922a-dabf3de3f69a}'");
+
 WqlEventQuery delevionEventQuery = new WqlEventQuery(
     "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE " +
     "TargetInstance ISA 'Win32_PnPEntity' " +
     "AND TargetInstance.Caption LIKE '%Telit Serial Diagnostics Interface%'");
 
+WqlEventQuery deletionA73Query = new(
+    "SELECT * FROM __InstanceDeletionEvent WITHIN 1 WHERE " +
+    "TargetInstance ISA 'Win32_PnPEntity' " +
+    "AND TargetInstance.ClassGuid = '{eec5ad98-8080-425f-922a-dabf3de3f69a}'");
+
 WqlObjectQuery deviceQuery = new WqlObjectQuery(
     "SELECT * FROM Win32_PnPEntity WHERE " +
     "Caption LIKE '%Telit Serial Diagnostics Interface%'");
+
+WqlObjectQuery a73Query = new WqlObjectQuery(
+    "SELECT * FROM Win32_PnPEntity WHERE ClassGuid = '{eec5ad98-8080-425f-922a-dabf3de3f69a}'"
+);
 
 string WaitForEvent(WqlEventQuery query)
 {
@@ -42,9 +55,9 @@ string GetDevice(WqlObjectQuery query)
     if (objCollection.Count <= 0) return string.Empty;
     var deviceMOFtext = objCollection.Cast<ManagementObject>().First().GetText(TextFormat.Mof);
 
-    var portName = deviceMOFtext.Split(new char[] { '(', ')' })
-                                .Where(x => x.Contains("COM", StringComparison.OrdinalIgnoreCase)).First();
-    return portName;
+    // var portName = deviceMOFtext.Split(new char[] { '(', ')' })
+    //                             .Where(x => x.Contains("COM", StringComparison.OrdinalIgnoreCase)).First();
+    return deviceMOFtext;
 }
 
 #pragma warning restore CA1416
@@ -52,11 +65,12 @@ string GetDevice(WqlObjectQuery query)
 // Testing
 while (true)
 {
-    System.Console.WriteLine(GetDevice(deviceQuery));
-    await Task.Delay(100);
+    System.Console.WriteLine("CREATION ====================================\n" + WaitForEvent(creationA73Query));
+    System.Console.WriteLine("DELETION ====================================\n" + WaitForEvent(deletionA73Query));
+    await Task.Delay(1001);
 }
 
-
+/*
 var _lock = new object();
 
 var modemPort = new SerialPort("COM5")
