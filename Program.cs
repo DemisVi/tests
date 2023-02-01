@@ -11,10 +11,7 @@ using System.Collections.Generic;
 using FTD2XX_NET;
 using Wrench.Model;
 
-var ft = new FTDI();
-
-
-var cu1 = new ContactUnit("CANCOM26", "COM49", 200D, System.Console.WriteLine);
+var cu1 = new ContactUnit("CANCOM", 200D, System.Console.WriteLine);
 
 Task.Factory.StartNew(() => Test(cu1));
 
