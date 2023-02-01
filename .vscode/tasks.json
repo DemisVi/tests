@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/tests.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -20,8 +20,11 @@
             "args": [
                 "publish",
                 "-c:release",
-                "${workspaceFolder}/test.csproj",
+                "${workspaceFolder}/tests.csproj",
                 "/property:GenerateFullPaths=true",
+                "/property:SelfContained=true",
+                "/property:ProduceSingleFile=true",
+                "/property:StripExecutable=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
@@ -34,7 +37,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/test.csproj"
+                "${workspaceFolder}/tests.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
