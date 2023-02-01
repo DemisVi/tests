@@ -17,6 +17,11 @@ public class Base34
         item._value--;
         return item;
     }
+
+    public static Base34 operator +(Base34 left, Base34 rught) => new Base34(left._value + rught._value);
+
+    public static Base34 operator -(Base34 left, Base34 rught) => new Base34(left._value - rught._value);
+    
     public static explicit operator string(Base34 base34) => base34.ToString();
     public static explicit operator Base34(string base34String) => new Base34(base34String);
 }

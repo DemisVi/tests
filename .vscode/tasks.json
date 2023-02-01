@@ -22,6 +22,9 @@
                 "-c:release",
                 "${workspaceFolder}/test.csproj",
                 "/property:GenerateFullPaths=true",
+                "/property:SelfContained=true",
+                "/property:ProduceSingleFile=true",
+                "/property:StripExecutable=true",
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
