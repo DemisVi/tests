@@ -9,6 +9,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+#if DEBUG
+System.Console.WriteLine("DEBUGGGGGG");
+#elif RELEASE
+System.Console.WriteLine("RELEEEEEASE");
+#endif
+
+
+/*
 var sourcePath = Path.Combine(Environment.CurrentDirectory, "./Data/");
 var destPath = "C:/Wrench/Data/";
 var factoryPath = Directory.GetFiles(sourcePath, "*.cfg", SearchOption.AllDirectories).First();
@@ -45,3 +53,4 @@ void UpdateCFG(string? path)
 
     fac.SaveFactory();
 }
+*/
