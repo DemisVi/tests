@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.IO;
 using System.IO.Ports;
 using System.Diagnostics;
@@ -9,48 +11,58 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-#if DEBUG
-System.Console.WriteLine("DEBUGGGGGG");
-#elif RELEASE
-System.Console.WriteLine("RELEEEEEASE");
-#endif
+object _lock = new();
 
+Serv();
+Thread.Sleep(1000);
+Cli();
+Thread.Sleep(1000);
+Cli();
+Thread.Sleep(1000);
+Cli();
+Thread.Sleep(1000);
 
-/*
-var sourcePath = Path.Combine(Environment.CurrentDirectory, "./Data/");
-var destPath = "C:/Wrench/Data/";
-var factoryPath = Directory.GetFiles(sourcePath, "*.cfg", SearchOption.AllDirectories).First();
-var factoryDir = Path.GetDirectoryName(factoryPath);
-var factoryName = Path.GetFileName(factoryPath);
-
-UpdateCFG(factoryDir);
-
-CopyPackage(sourcePath, destPath);
-
-
-
-void CopyPackage(string? source, string? dest)
+async Task Serv()
 {
-    if (string.IsNullOrEmpty(source)) throw new FileNotFoundException("could not copy from nowhere");
-    if (string.IsNullOrEmpty(dest)) throw new FileNotFoundException("could not copy to nowhere");
-    var dirs = Directory.GetDirectories(source, "*", SearchOption.AllDirectories);
-    var files = Directory.GetFiles(source, "*", SearchOption.AllDirectories);
+    var buffer = new byte[65536];
 
-    foreach (var dir in dirs) Directory.CreateDirectory(dir.Replace(source, dest));
-    foreach (var fi in files) File.Copy(fi, fi.Replace(source, dest));
+    try
+    {
+        var ep = new IPEndPoint(IPAddress.Any, 123);
+        var lis = new TcpListener(ep);
+        lis.Start();
+
+        while (true)
+        {
+            var sock = await lis.AcceptSocketAsync();
+            var bytesReceived = sock.Receive(buffer);
+            if (bytesReceived > 0)
+                System.Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesReceived));
+        }
+    }
+    catch (Exception ex)
+    {
+        System.Console.WriteLine(ex.Message);
+    }
 }
 
-void UpdateCFG(string? path)
+async Task Cli()
 {
-    if (string.IsNullOrEmpty(path)) throw new FileNotFoundException("factory.cfg path not found");
+    lock (_lock)
+    {
+        try
+        {
+            var ep = new IPEndPoint(new IPAddress(new byte[] { 127, 0, 0, 1 }), 123);
+            var cli = new TcpClient();
+            cli.Connect(ep);
 
-    var fac = new FactoryCFG(path);
-    fac.ReadFactory();
+            cli.GetStream().Write(Encoding.ASCII.GetBytes(DateTime.Now.ToString("G")));
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine(ex.Message);
+        }
 
-    fac.SerialNumber += (Base34)"1000";
-
-    System.Console.WriteLine($"Serial: {fac.SerialNumber}");
-
-    fac.SaveFactory();
+    }
 }
 */
