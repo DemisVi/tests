@@ -11,58 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-object _lock = new();
+System.Console.WriteLine(BitConverter.ToString(new byte[] {0x01, 0x02, 0xAA}));
 
-Serv();
-Thread.Sleep(1000);
-Cli();
-Thread.Sleep(1000);
-Cli();
-Thread.Sleep(1000);
-Cli();
-Thread.Sleep(1000);
-
-async Task Serv()
+public static class DayOfWeekExtension
 {
-    var buffer = new byte[65536];
-
-    try
-    {
-        var ep = new IPEndPoint(IPAddress.Any, 123);
-        var lis = new TcpListener(ep);
-        lis.Start();
-
-        while (true)
-        {
-            var sock = await lis.AcceptSocketAsync();
-            var bytesReceived = sock.Receive(buffer);
-            if (bytesReceived > 0)
-                System.Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesReceived));
-        }
-    }
-    catch (Exception ex)
-    {
-        System.Console.WriteLine(ex.Message);
-    }
+    public static bool IsWeekend(this DayOfWeek day) => (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday);
 }
-
-async Task Cli()
-{
-    lock (_lock)
-    {
-        try
-        {
-            var ep = new IPEndPoint(new IPAddress(new byte[] { 127, 0, 0, 1 }), 123);
-            var cli = new TcpClient();
-            cli.Connect(ep);
-
-            cli.GetStream().Write(Encoding.ASCII.GetBytes(DateTime.Now.ToString("G")));
-        }
-        catch (Exception ex)
-        {
-            System.Console.WriteLine(ex.Message);
-        }
-
-    }
-}
-*/
