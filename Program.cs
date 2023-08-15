@@ -1,7 +1,23 @@
-﻿using System;
+﻿using Avalonia;
+using Avalonia.ReactiveUI;
+using System;
 
-var v = Environment.GetEnvironmentVariable("path", EnvironmentVariableTarget.Machine);
+namespace tests;
 
-Environment.SetEnvironmentVariable("path", "C:\\;" + v, EnvironmentVariableTarget.Machine);
+class Program
+{
+    // Initialization code. Don't use any Avalonia, third-party APIs or any
+    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+    // yet and stuff might break.
+    [STAThread]
+    public static void Main(string[] args) => BuildAvaloniaApp()
+        .StartWithClassicDesktopLifetime(args);
 
-System.Console.WriteLine(Environment.GetEnvironmentVariable("path"));
+    // Avalonia configuration, don't remove; also used by visual designer.
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace()
+            .UseReactiveUI();
+}
