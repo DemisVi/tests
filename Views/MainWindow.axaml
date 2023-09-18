@@ -15,8 +15,8 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <StackPanel>
-        <DataGrid AutoGenerateColumns="true" ItemsSource="{Binding Items}"/>
-    </StackPanel>
+    <ScrollViewer>
+        <DataGrid AutoGenerateColumns="true" ItemsSource="{Binding Items}" />
+    </ScrollViewer>
 
 </Window>

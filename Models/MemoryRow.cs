@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ArteryISPProg.Models;
 
@@ -183,9 +185,19 @@ public class MemoryRow
         }
     }
 
-    public void Set(byte[] data)
+    public MemoryRow(byte[] data, int addressShift)
+    {
+        Address = Constants.StartAddress + addressShift;
+        Set(data);
+    }
+
+    public MemoryRow Set(byte[] data)
     {
         var lastIndex = data.Length < Constants.RowLength ? data.Length : Constants.RowLength;
         _data = data[0..lastIndex];
+        return this;
     }
+
+    public static List<MemoryRow> Generate(byte[] data) =>
+        data.Chunk(Constants.RowLength).Select((x, y) => new MemoryRow(x, y)).ToList();
 }
