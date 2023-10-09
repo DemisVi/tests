@@ -1,69 +1,125 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
+using CsvHelper;
+using CsvHelper.Configuration;
 
-var source1 = args[0];
-var source2 = args[1];
-
-var files1 = Directory.EnumerateFiles(args[0], "*", SearchOption.AllDirectories);
-var files2 = Directory.EnumerateFiles(args[1], "*", SearchOption.AllDirectories);
-
-var dict1 = new Dictionary<string, byte[]>();
-var dict2 = new Dictionary<string, byte[]>();
-
-Calculate(ref dict1, files1);
-Calculate(ref dict2, files2);
-
-var compared = Compare(dict1, dict2);
-
-System.Console.WriteLine($"arg1 = {dict1.Count} files. arg2 = {dict2.Count}\nCompared {compared} files with no differences");
-
-int Compare(Dictionary<string, byte[]> left, Dictionary<string, byte[]> right)
+using var file = File.OpenText("./contacts.csv");
+using var outfile = File.CreateText("./good.csv");
+using var reader = new CsvReader(file, new CsvConfiguration(CultureInfo.CurrentCulture)
 {
-    Dictionary<string, byte[]> greaterOne;
-    Dictionary<string, byte[]> lesserOne;
-    var count = 0;
+    Delimiter = ",",
+    HasHeaderRecord = false,
+});
+using var writer = new CsvWriter(outfile, CultureInfo.CurrentCulture);
 
-    if (left.Count >= right.Count)
-    {
-        greaterOne = left;
-        lesserOne = right;
-    }
-    else
-    {
-        greaterOne = right;
-        source1 = args[1];
-        lesserOne = left;
-        source2 = args[0];
-    }
+var records = reader.GetRecords<Rec>().Select(x => new GoodEntry(x.LastName,
+                                                                 x.FirstName,
+                                                                 x.SurName,
+                                                                 x.JobTitle,
+                                                                 x.WorkPhone,
+                                                                 x.Email.Replace("(", "<").Replace(")", ">")));
 
-    foreach (var key1 in greaterOne.Keys)
-    {
-        var key2 = key1.Replace(source1, source2);
-        try
-        {
-            if (greaterOne[key1].SequenceEqual(lesserOne[key2]))
-            {
-                count++;
-                //Console.WriteLine("{0}, {1}, {2}", key, Convert.ToHexString(greaterOne[key]), "OK");
-            }
-            else
-            {
-                Console.WriteLine("{0},\t{1}\n{2},\t{3}", key1, key2, Convert.ToHexString(greaterOne[key1]), Convert.ToHexString(lesserOne[key2]));
-            }
-        }
-        catch (KeyNotFoundException ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-    return count;
-}
+writer.WriteRecords(records);
 
-void Calculate(ref Dictionary<string, byte[]> dict, IEnumerable<string> files)
-{
-    using var sha256 = SHA1.Create();
-    foreach (var file in files)
-        // System.Console.WriteLine(file);
-        dict.Add(file, sha256.ComputeHash(File.ReadAllBytes(file)));
-}
+record GoodEntry(
+string LastName,
+string FirstName,
+string SurName,
+string JobTitle,
+string WorkPhone,
+string Email);
+
+record Rec(
+string q1,
+string LastName,
+string FirstName,
+string SurName,
+string q2,
+string q3,
+string q4,
+string JobTitle,
+string q5,
+string q6,
+string q7,
+string q8,
+string q9,
+string q10,
+string q11,
+string q12,
+string q13,
+string q14,
+string q15,
+string q16,
+string q17,
+string q18,
+string q19,
+string q20,
+string q21,
+string q22,
+string q23,
+string q24,
+string q25,
+string q26,
+string q27,
+string WorkPhone,
+string q28,
+string q29,
+string q30,
+string q31,
+string q32,
+string q33,
+string q34,
+string q35,
+string q36,
+string q37,
+string q38,
+string q39,
+string q40,
+string q41,
+string q42,
+string q43,
+string q44,
+string q45,
+string q46,
+string q47,
+string q48,
+string q49,
+string q50,
+string q51,
+string q52,
+string q53,
+string q54,
+string q55,
+string q56,
+string q57,
+string q58,
+string q59,
+string q60,
+string q61,
+string q62,
+string q63,
+string q64,
+string q65,
+string q66,
+string q67,
+string q68,
+string q69,
+string q70,
+string q71,
+string q72,
+string q73,
+string q74,
+string q75,
+string q76,
+string q77,
+string q78,
+string q79,
+string Email,
+string q80,
+string q81,
+string q82,
+string q83,
+string q84,
+string q85,
+string q86);
