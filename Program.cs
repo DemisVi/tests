@@ -1,125 +1,63 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
+using System.Text;
+using Wrench.Model;
+using Wrench.Services;
 
-using var file = File.OpenText("./contacts.csv");
-using var outfile = File.CreateText("./good.csv");
-using var reader = new CsvReader(file, new CsvConfiguration(CultureInfo.CurrentCulture)
+if (true)
 {
-    Delimiter = ",",
-    HasHeaderRecord = false,
-});
-using var writer = new CsvWriter(outfile, CultureInfo.CurrentCulture);
+    var file = File.ReadAllLines("./log.log");
+    for (var i = 0; i < file.Length; i++)
+    {
+        for (var j = i + 1; j < file.Length; j++)
+        {
+            if (file[i] == file[j])
+                System.Console.WriteLine(file[i]);
+        }
+    }
+}
 
-var records = reader.GetRecords<Rec>().Select(x => new GoodEntry(x.LastName,
-                                                                 x.FirstName,
-                                                                 x.SurName,
-                                                                 x.JobTitle,
-                                                                 x.WorkPhone,
-                                                                 x.Email.Replace("(", "<").Replace(")", ">")));
+if (false)
+{
+    var adapter = new AdapterLocator().AdapterSerials.Where(x => x.EndsWith("A")).First().Trim('A');
+    var unit = ContactUnit.GetInstance(adapter);
+    var factory = new FactoryCFG();
+    var adb = new Adb();
+    int max = "ZZZZ".ToInt32();
+    var log = File.AppendText("./log.log");
 
-writer.WriteRecords(records);
+    do
+    {
+        unit.PowerOn();
+        Thread.Sleep(TimeSpan.FromSeconds(12));
+        adb.Run("shell ls -l /data/factory.cfg");
+        Console.WriteLine(adb.LastStdOut);
+        adb.Run("shell cat /data/factory.cfg");
+        Console.WriteLine(adb.LastStdOut);
+        var text = adb.LastStdOut?
+            .Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Where(x => x.StartsWith("SERIAL"))
+            .First();
+        log.WriteLine(text);
+        log.Flush();
+        factory.ModelId = Random.Shared.Next(1, 20).ToString();
+        factory.SerialNumber = new Base34(Random.Shared.Next(max));
+        factory.SaveFactory();
+        adb.Run("push \"./factory.cfg\" /data");
+        Console.WriteLine(adb.LastStdOut);
+        adb.Run("shell ls -l /data/factory.cfg");
+        Console.WriteLine(adb.LastStdOut);
+        adb.Run("shell cat /data/factory.cfg");
+        Console.WriteLine(adb.LastStdOut);
+        adb.Run("shell sync");
+        adb.Run("reboot");
+        Thread.Sleep(TimeSpan.FromSeconds(5));
+        unit.PowerOff();
+        Thread.Sleep(TimeSpan.FromSeconds(1));
+    }
+    while (true);
 
-record GoodEntry(
-string LastName,
-string FirstName,
-string SurName,
-string JobTitle,
-string WorkPhone,
-string Email);
 
-record Rec(
-string q1,
-string LastName,
-string FirstName,
-string SurName,
-string q2,
-string q3,
-string q4,
-string JobTitle,
-string q5,
-string q6,
-string q7,
-string q8,
-string q9,
-string q10,
-string q11,
-string q12,
-string q13,
-string q14,
-string q15,
-string q16,
-string q17,
-string q18,
-string q19,
-string q20,
-string q21,
-string q22,
-string q23,
-string q24,
-string q25,
-string q26,
-string q27,
-string WorkPhone,
-string q28,
-string q29,
-string q30,
-string q31,
-string q32,
-string q33,
-string q34,
-string q35,
-string q36,
-string q37,
-string q38,
-string q39,
-string q40,
-string q41,
-string q42,
-string q43,
-string q44,
-string q45,
-string q46,
-string q47,
-string q48,
-string q49,
-string q50,
-string q51,
-string q52,
-string q53,
-string q54,
-string q55,
-string q56,
-string q57,
-string q58,
-string q59,
-string q60,
-string q61,
-string q62,
-string q63,
-string q64,
-string q65,
-string q66,
-string q67,
-string q68,
-string q69,
-string q70,
-string q71,
-string q72,
-string q73,
-string q74,
-string q75,
-string q76,
-string q77,
-string q78,
-string q79,
-string Email,
-string q80,
-string q81,
-string q82,
-string q83,
-string q84,
-string q85,
-string q86);
+
+}
