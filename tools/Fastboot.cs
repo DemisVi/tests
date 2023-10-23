@@ -5,5 +5,5 @@ namespace Tools;
 
 public class Fastboot : Tool
 {
-    public override string ToolPath { get; } = "fastboot.exe";
+    public override string ToolPath { get; } = "fastboot";
 }

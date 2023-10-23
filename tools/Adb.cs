@@ -5,5 +5,5 @@ namespace Tools;
 
 public class Adb : Tool
 {
-    public override string ToolPath { get; } = "adb.exe";
+    public override string ToolPath { get; } = "adb";
 }
