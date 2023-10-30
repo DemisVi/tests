@@ -1,0 +1,15 @@
+global using System;
+global using System.IO;
+global using System.Reflection;
+global using System.Linq;
+global using System.Management;
+global using System.Device.Gpio;
+global using System.Device.Pwm.Drivers;
+global using System.Diagnostics;
+global using Iot.Device.Ft2232H;
+global using Iot.Device.Ft232H;
+global using Iot.Device.FtCommon;
+global using System.IO.Ports;
+global using System.Runtime.InteropServices;
+global using System.Text;
+global using Iot.Device.Media;
