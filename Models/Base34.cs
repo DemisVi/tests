@@ -1,7 +1,5 @@
 using System;
 
-namespace Wrench.Model;
-
 public class Base34
 {
     private int _value = 0;

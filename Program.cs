@@ -1,11 +1,37 @@
-﻿using System;
-using Wrench.Model;
+﻿var host = Host.CreateDefaultBuilder()
+               .ConfigureServices(x => x.AddSingleton<ICU, CU>()
+                                        .AddSingleton<IWriter, Writer>())
+               .Build();
 
-var searcher = new SerialPortSearcher();
+host.Services.GetService<IWriter>()?.Run();
 
-searcher.Query = WqlQueries.ObjectSimcomModem;
-System.Console.WriteLine(searcher.GetPortNames().FirstOrDefault());
-searcher.Query = WqlQueries.ObjectSimcomATPort;
-System.Console.WriteLine(searcher.GetPortNames().FirstOrDefault());
-searcher.Query = WqlQueries.ObjectFtdiSerial;
-System.Console.WriteLine(searcher.GetPortNames().FirstOrDefault());
+public interface IWriter
+{
+    public void Run();
+}
+
+public class Writer : IWriter
+{
+    private ICU _cu;
+    private IHost _host;
+    public Writer(IHost host, ICU contactUnit)
+    {
+        _host = host;
+        _cu = contactUnit;
+    }
+
+    public void Run()
+    { 
+        System.Console.WriteLine("Writer ran"); 
+        _cu.Run();
+        _host.Services.GetRequiredService<ICU>();
+    }
+}
+
+public interface ICU { public void Run(); }
+
+public class CU : ICU
+{
+    public void Run()
+    { System.Console.WriteLine("CU ran"); }
+}

@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.Text;
 
-namespace Wrench.Model;
-
 public static class Base34Extensions
 {
     public static string ToDeviceSerial(this Base34 value) =>

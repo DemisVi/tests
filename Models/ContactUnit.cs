@@ -6,16 +6,19 @@ using System.Management;
 using System.Device.Gpio;
 using Iot.Device.Ft2232H;
 using Iot.Device.FtCommon;
-using Wrench.Model;
+using System.Threading;
 
 public class ContactUnit : IContactUnit, IDisposable
 {
-    private GpioOutputs _outputs;
-    private bool disposedValue;
+    private bool _disposedValue;
 
-    private Ftx232HDevice CuFtDevice { get; }
-    private FtSerialPort CuSerialPort { get; }
-    private GpioPin PowerPin { get; }
+    private GpioOutputs _outputs;
+    private GpioInputs _inputs;
+    private Ftx232HDevice _cuFtDevice;
+    private FtSerialPort _cuSerialPort;
+    private GpioPin _powerPin;
+    private GpioPin _cl15Pin;
+
     public GpioOutputs Outputs
     {
         get => _outputs;
@@ -25,24 +28,37 @@ public class ContactUnit : IContactUnit, IDisposable
             WriteGpio();
         }
     }
-    public GpioInputs Inputs { get; private set; }
+    public GpioInputs Inputs
+    {
+        get
+        {
+            ReadGpio();
+            return _inputs;
+        }
+        private set => _inputs = value;
+    }
 
     public ContactUnit(FtSerialPort cuSerialPort, Ftx232HDevice ftDevice)
     {
-        CuSerialPort = cuSerialPort;
-        CuFtDevice = ftDevice;
-        using var gpio = CuFtDevice.CreateGpioController();
-        PowerPin = gpio.OpenPin(Ft2232HDevice.GetPinNumberFromString("ADBUS0"), PinMode.Output);
-        CuSerialPort.Open();
+        _cuSerialPort = cuSerialPort;
+        _cuFtDevice = ftDevice;
+        using var gpio = _cuFtDevice.CreateGpioController();
+        _powerPin = gpio.OpenPin(Ft2232HDevice.GetPinNumberFromString("ADBUS0"), PinMode.Output);
+        _cl15Pin = gpio.OpenPin(Ft2232HDevice.GetPinNumberFromString("ADBUS2"), PinMode.Output);
+        _cuSerialPort.Open();
     }
 
     public void LockBoard() => Outputs |= GpioOutputs.Pn1;
 
     public void ReleaseBoard() => Outputs &= ~GpioOutputs.Pn1;
 
-    public void PowerOffBoard() => PowerPin.Write(PinValue.High);
+    public void PowerOffBoard() => _powerPin.Write(PinValue.High);
 
-    public void PowerOnBoard() => PowerPin.Write(PinValue.Low);
+    public void PowerOnBoard() => _powerPin.Write(PinValue.Low);
+    
+    public void Cl15Off() => _cl15Pin.Write(PinValue.High);
+    
+    public void Cl15On() => _cl15Pin.Write(PinValue.Low);
 
     public void LEDOff() => Outputs &= ~GpioOutputs.White;
 
@@ -90,32 +106,32 @@ public class ContactUnit : IContactUnit, IDisposable
 
     private void WriteGpio()
     {
-        CuSerialPort.Write(CuCommands.CuWriteOutputs, 0, CuCommands.CuWriteOutputs.Length);
-        CuSerialPort.Write(new byte[] { (byte)Outputs }, 0, 1);
+        _cuSerialPort.Write(CuCommands.CuWriteOutputs, 0, CuCommands.CuWriteOutputs.Length);
+        _cuSerialPort.Write(new byte[] { (byte)Outputs }, 0, 1);
     }
 
     private void ReadGpio()
     {
-        CuSerialPort.Write(CuCommands.CuReadInputs, 0, CuCommands.CuReadInputs.Length);
-
+        _cuSerialPort.Write(CuCommands.CuReadInputs, 0, CuCommands.CuReadInputs.Length);
+        Thread.Sleep(20);
         var received = new byte[3];
-        CuSerialPort.Read(received, 0, received.Length);
+        _cuSerialPort.Read(received, 0, received.Length);
         Inputs = (GpioInputs)received[2];
     }
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects)
-                CuSerialPort.Dispose();
+                _cuSerialPort.Dispose();
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer
             // TODO: set large fields to null
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

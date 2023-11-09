@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wrench.Model;
-
 public class FactoryCFG
 {
     private const string _baseName = "factory.cfg";

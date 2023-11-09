@@ -1,39 +1,56 @@
-using System.Threading.Tasks;
-using System.IO.Ports;
-using System.Threading;
 using System;
-using System.Linq;
+using System.IO.Ports;
+using System.Reflection.Metadata;
+using Iot.Device.Mcp23xxx;
+using Microsoft.Win32.SafeHandles;
+using OfficeOpenXml.Packaging.Ionic.Zip;
 
-namespace Wrench.Extensions;
-
-public static class SerialExtensions
+public static class SerialPortExtensions
 {
-    public static async Task<bool> WaitModemStartAsync(this SerialPort port, ModemType modemType, int timeoutSeconds = 10)
+    /// <summary>
+    /// Send AT command to Modem Port and try to read ansver.
+    /// </summary>
+    /// <param name="port">Modem SerialPort</param>
+    /// <param name="request">AT string to send</param>
+    /// <param name="responce">Once read answer success, will contain response, else exception message.</param>
+    /// <param name="millisecondsTimeout">Time before read response message</param>
+    /// <returns>
+    /// "true" if request is success, "false" if port is died.
+    /// Also not mean that request is unsuccessful.
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static bool TryGetResponse(this SerialPort port, string request, out string responce, int millisecondsTimeout = 200)
     {
-        if (!port.IsOpen) throw new InvalidOperationException("Modem port closed");
+        if (port is { IsOpen: false }) throw new InvalidOperationException("the port is closed");
 
-        var start = DateTime.Now;
-        var elapsed = TimeSpan.Zero;
-        string res;
-
-        do
+        try
         {
-            try
-            {
-                port.DiscardOutBuffer();
-                await Task.Delay(500);
-                port.WriteLine(modemType.BootCommand);
-            }
-            catch (TimeoutException) { }
-            res = port.ReadLine();
-            res += port.ReadExisting();
-            elapsed = DateTime.Now - start;
-        } while (!res.Contains("OK") || elapsed.Seconds < timeoutSeconds);
-        await Task.Delay(1000);
-        port.DiscardInBuffer();
-        return res.Contains("OK");
+            port.WriteLine(request);
+
+            Thread.Sleep(millisecondsTimeout);
+
+            responce = port.ReadExisting();
+            return true;
+        }
+        catch (InvalidOperationException ex)
+        {
+            port.KillHandle();
+
+            responce = ex.Message;
+            return false;
+        }
     }
 
-    public static bool WaitModemStart(this SerialPort port, ModemType modemType, int timeoutSeconds = 10) =>
-        port.WaitModemStartAsync(modemType, timeoutSeconds).GetAwaiter().GetResult();
+    /// <summary>
+    /// Close internal SerialStream handle
+    /// </summary>
+    /// <param name="port"></param>
+    public static void KillHandle(this SerialPort port)
+    {
+        var stream = typeof(SerialPort).GetField("_internalSerialStream", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(port);
+        var handle = (SafeFileHandle?)stream?.GetType().GetField("_handle", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(stream);
+
+        if (handle is not null and { IsClosed: false })
+            handle.Close();
+    }
 }
