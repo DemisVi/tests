@@ -1,4 +1,7 @@
 using System;
+using Wrench.Extensions;
+
+namespace Wrench.DataTypes;
 
 public class Base34
 {
@@ -8,6 +11,7 @@ public class Base34
     public Base34(string value) => _value = value.ToInt32();
     public Base34(int value) => _value = value;
     public override string ToString() => _value.ToBase34();
+    
     public static Base34 operator ++(Base34 item)
     {
         item._value++;

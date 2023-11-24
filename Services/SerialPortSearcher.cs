@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
 using System.Management;
+
+namespace Wrench.Services;
 
 #pragma warning disable CA1416
 
