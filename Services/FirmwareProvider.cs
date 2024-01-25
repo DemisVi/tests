@@ -6,28 +6,36 @@ using Wrench.Models;
 
 namespace Wrench.Services;
 
-public class FirmwareProvider : IFirmwareProvider
+public class FirmwareProvider
 {
-    public string RootPath { get; set; } = string.Empty;
-    public FirmwareProvider(string path)
+    public FirmwareSource? Source { get; set; }
+    public FirmwareProvider() { }
+    public FirmwareProvider(FirmwareSource source)
     {
-        RootPath = path;
+        Source = source;
     }
 
-    public IEnumerable<Firmware> GetFirmware() => GetFirmware(RootPath);
-    public static IEnumerable<Firmware> GetFirmware(string path)
+    public IEnumerable<Firmware> GetFirmware() => GetFirmware(Source);
+    public IEnumerable<Firmware> GetFirmware(FirmwareSource? source)
     {
-        if (string.IsNullOrEmpty(path)) throw new ArgumentException("Path can't be null or empty", nameof(path));
+        if (source is null) throw new ArgumentException("Source can't be null or empty", nameof(source));
+
+        var path = Path.Combine(Environment.CurrentDirectory, source.SubfolderName);
+
+        if (Directory.Exists(path) is not true)
+            return Enumerable.Empty<Firmware>();
 
         var firmwareDirectories = Directory.GetDirectories(path);
         return firmwareDirectories.Select(dir => new Firmware()
         {
             FirmwarePath = dir,
             ModelName = new DirectoryInfo(dir).Name,
-            Packages = Directory.GetDirectories(dir).Select(dir => new Package()
+            Packages = Directory.GetDirectories(dir).Select(indir => new Package()
             {
-                PackagePath = dir,
-                VersionName = new DirectoryInfo(dir).Name,
+                ModelName = new DirectoryInfo(dir).Name,
+                PackagePath = indir,
+                VersionName = new DirectoryInfo(indir).Name,
+                DeviceType = source.DeviceType,
             }),
         });
     }

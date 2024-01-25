@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:PackageManager.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PackageManager.Views.MainPageView"
+             x:DataType="vm:MainPageViewModel">
+  
+  <UserControl.Styles>
+    <Style Selector="Button.x">
+      <Setter Property="DockPanel.Dock" Value="Right"/>
+      <Setter Property="Width" Value="30"/>
+    </Style>
+    <Style Selector="Button.y">
+      <Setter Property="DockPanel.Dock" Value="Left"/>
+    </Style>
+    <Style Selector="TreeView">
+      <Setter Property="Grid.Row" Value="1"/>
+      <!-- <Setter Property="Background" Value="DarkGray"/> -->
+    </Style>
+  </UserControl.Styles>
+  
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <DockPanel HorizontalAlignment="Stretch" Grid.Row="0">
+      <Button Classes="x" Content="x"/>
+      <Button Classes="y" Content="y"/>
+      <Label> Label </Label>
+    </DockPanel>
+
+    <TreeView ItemsSource="{Binding FirmwareCollection}">
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate ItemsSource="{Binding Packages}">
+          <Label Content="{Binding ModelName}"/>
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
+    
+  </Grid>
+  
+</UserControl>

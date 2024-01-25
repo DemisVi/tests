@@ -7,9 +7,9 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/tests.csproj",
+                "PackageManager.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -19,13 +19,9 @@
             "type": "process",
             "args": [
                 "publish",
-                "-c:release",
-                "${workspaceFolder}/tests.csproj",
+                "PackageManager.csproj",
                 "/property:GenerateFullPaths=true",
-                "/property:SelfContained=true",
-                "/property:ProduceSingleFile=true",
-                "/property:StripExecutable=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -37,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/tests.csproj"
+                "PackageManager.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
