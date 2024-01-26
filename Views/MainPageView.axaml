@@ -25,14 +25,15 @@
 
     <DockPanel HorizontalAlignment="Stretch" Grid.Row="0">
       <Button Classes="x" Content="x"/>
-      <Button Classes="y" Content="y"/>
+      <Button Classes="y" Content="y"
+        Command="{Binding CreateDummySources}"/>
       <Label> Label </Label>
     </DockPanel>
 
-    <TreeView ItemsSource="{Binding FirmwareCollection}">
+    <TreeView ItemsSource="{Binding SourceNodes}">
       <TreeView.ItemTemplate>
-        <TreeDataTemplate ItemsSource="{Binding Packages}">
-          <Label Content="{Binding ModelName}"/>
+        <TreeDataTemplate ItemsSource="{Binding SubNodes}">
+          <Label Content="{Binding Title}"/>
         </TreeDataTemplate>
       </TreeView.ItemTemplate>
     </TreeView>

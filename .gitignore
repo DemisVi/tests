@@ -483,6 +483,7 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
+SimCom_full
 SimCom_retro
 SimCom_simple
 Telit_retro

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Wrench.Models;
+namespace PackageManager.Models;
 
 public class Firmware
 {

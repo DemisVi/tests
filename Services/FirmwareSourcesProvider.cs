@@ -5,16 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Wrench.Models;
-using Wrench.DataTypes;
+using PackageManager.Models;
+using PackageManager.DataTypes;
 
-namespace Wrench.Services;
+namespace PackageManager.Services;
 
 public class FirmwareSourcesProvider
 {
     public static string DefaultFileName { get; } = "Sources.json";
     public string DefaultSourcesDir { get; set; } = Path.Combine(Environment.CurrentDirectory, DefaultFileName);
-    private IEnumerable<FirmwareSource> DefaultSources { get; } = new FirmwareSource[] {
+    public static IEnumerable<FirmwareSource> DefaultSources { get; } = new FirmwareSource[] {
          new()
          {
             Name = "SimCom ПФ",

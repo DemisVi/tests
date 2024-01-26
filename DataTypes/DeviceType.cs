@@ -1,6 +1,6 @@
 using System;
 
-namespace Wrench.DataTypes;
+namespace PackageManager.DataTypes;
 
 [Flags]
 public enum DeviceType

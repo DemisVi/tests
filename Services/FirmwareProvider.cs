@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Wrench.Models;
+using PackageManager.Models;
 
-namespace Wrench.Services;
+namespace PackageManager.Services;
 
 public class FirmwareProvider
 {

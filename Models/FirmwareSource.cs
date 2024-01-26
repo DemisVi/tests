@@ -1,7 +1,7 @@
 using System;
-using Wrench.DataTypes;
+using PackageManager.DataTypes;
 
-namespace Wrench.Models;
+namespace PackageManager.Models;
 
 public class FirmwareSource
 {
