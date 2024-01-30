@@ -3,7 +3,4 @@
 public class MainWindowViewModel : ViewModelBase
 {
     public ViewModelBase model { get; } = new MainPageViewModel();
-
-
-
 }
