@@ -25,15 +25,24 @@ public class MainPageViewModel : ViewModelBase
     public ObservableCollection<FirmwareSource>? FirmwareSources { get; set; }
     public object? SelectedItem
     {
-        get => selectedItem;
+        get => null;
         set
         {
             selectedItem = value;
-            if (value is Firmware f) 
+
+            switch (value)
             {
-                FwViewModel = new FirmwareViewModel() { ModelId = f.ModelName, Serial = f.FirmwarePath };
-                this.RaisePropertyChanged(nameof(FwViewModel));
+                case Firmware f:
+                    FwViewModel = new FirmwareViewModel(f);
+                    break;
+                case Package p:
+                    FwViewModel = new PackageViewModel(p);
+                    break;
+                default:
+                    break;
             }
+
+            this.RaisePropertyChanged(nameof(FwViewModel));
         }
     }
 }

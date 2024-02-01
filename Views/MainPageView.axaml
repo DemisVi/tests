@@ -8,49 +8,30 @@
              x:Class="PackageManager.Views.MainPageView"
              x:DataType="vm:MainPageViewModel">
   
-    <Grid RowDefinitions="Auto,*,*,Auto" ColumnDefinitions="*,*">
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,*">
 
-    <DockPanel HorizontalAlignment="Stretch" Grid.Row="0" Grid.ColumnSpan="2">
+      <Button Grid.Row="0" Margin="10">Open</Button>
 
-      <Button DockPanel.Dock="Right" Content="x"/>
-
-<!--       <ComboBox
-        ItemsSource="{Binding FirmwareSources}" 
-        SelectedItem="{Binding SelectedSource}"
-        PlaceholderText="Выбор типа изделия">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <StackPanel Orientation="Vertical">
-              <TextBlock Text="{Binding Name}"/>
-              <TextBlock Text="{Binding SubfolderName}" FontSize="9"/>
-            </StackPanel>
+      <TreeView Grid.Row="1" ItemsSource="{Binding FirmwareSources}" 
+        SelectedItem="{Binding SelectedItem}">
+        <TreeView.DataTemplates>
+          <TreeDataTemplate DataType="models:FirmwareSource" ItemsSource="{Binding Firmware}">
+            <Grid>
+              <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
+              <Button HorizontalAlignment="Right" Margin="10,0">Add Firmware</Button>
+            </Grid>
+          </TreeDataTemplate>
+          <TreeDataTemplate DataType="models:Firmware" ItemsSource="{Binding Packages}">
+            <TextBlock Text="{Binding ModelName}"/>
+          </TreeDataTemplate>
+          <DataTemplate DataType="models:Package">
+            <TextBlock Text="{Binding VersionName}"/>
           </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
- -->
-      <Button Content="Open"/>
+        </TreeView.DataTemplates>
+      </TreeView>
 
-      <Label VerticalAlignment="Center">Label</Label>
-      
-    </DockPanel>
-
-    <TreeView Grid.Row="1" Grid.RowSpan="2" ItemsSource="{Binding FirmwareSources}" 
-      SelectedItem="{Binding SelectedItem}">
-      <TreeView.DataTemplates>
-        <TreeDataTemplate DataType="models:FirmwareSource" ItemsSource="{Binding Firmware}">
-          <TextBlock Text="{Binding Name}"/>
-        </TreeDataTemplate>
-        <TreeDataTemplate DataType="models:Firmware" ItemsSource="{Binding Packages}">
-          <TextBlock Text="{Binding ModelName}"/>
-        </TreeDataTemplate>
-        <DataTemplate DataType="models:Package">
-          <TextBlock Text="{Binding VersionName}"/>
-        </DataTemplate>
-      </TreeView.DataTemplates>
-    </TreeView>
-
-    <UserControl Grid.Row="1" Grid.Column="1" Content="{Binding FwViewModel}"/>
+      <UserControl Grid.Row="1" Grid.Column="1" Content="{Binding FwViewModel}"/>
     
-  </Grid>
+    </Grid>
   
 </UserControl>
