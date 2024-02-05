@@ -30,13 +30,14 @@ public class FirmwareProvider
         {
             FirmwarePath = dir,
             ModelName = new DirectoryInfo(dir).Name,
-            Packages = Directory.GetDirectories(dir).Select(indir => new Package()
+            Factory = new FactoryCFG(dir),
+            Packages = new(Directory.GetDirectories(dir).Select(indir => new Package()
             {
                 ModelName = new DirectoryInfo(dir).Name,
                 PackagePath = indir,
                 VersionName = new DirectoryInfo(indir).Name,
                 DeviceType = source.DeviceType,
-            }),
+            })),
         });
     }
 }

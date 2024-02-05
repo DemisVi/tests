@@ -58,7 +58,7 @@ public class FirmwareSourcesProvider
                 var fwProvider = new FirmwareProvider();
                 var src = JsonSerializer.Deserialize<FirmwareSource[]>(File.ReadAllText(path));
                 foreach (var i in src!)
-                    i.Firmware = fwProvider.GetFirmware(i);
+                    i.Firmware = new(fwProvider.GetFirmware(i));
 
                 return src;
             }

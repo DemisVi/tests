@@ -10,7 +10,7 @@
   
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,*">
 
-      <Button Grid.Row="0" Margin="10">Open</Button>
+      <Button Grid.Row="0" Margin="10" Command="{Binding Open}">Open</Button>
 
       <TreeView Grid.Row="1" ItemsSource="{Binding FirmwareSources}" 
         SelectedItem="{Binding SelectedItem}">

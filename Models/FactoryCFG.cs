@@ -27,6 +27,9 @@ public class FactoryCFG
 
     public FactoryCFG(string? path = "./") => _path = Path.Combine(path ?? Environment.CurrentDirectory, _baseName);
 
+    public string FullPath => _path;
+    public bool Exists => File.Exists(FullPath);
+
     public void ReadFactory()
     {
         try
@@ -56,7 +59,18 @@ public class FactoryCFG
 
     public string this[string parameter]
     {
-        get => _factory[parameter];
+        get
+        {
+            try
+            {
+                return _factory[parameter];
+            }
+            catch (KeyNotFoundException)
+            {
+                return string.Empty;
+            }
+        }
+
         set => _factory[parameter] = value;
     }
 }

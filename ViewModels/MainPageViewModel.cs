@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive;
+using Microsoft.VisualBasic;
 using PackageManager.Models;
 using PackageManager.Services;
 using ReactiveUI;
@@ -13,6 +15,7 @@ public class MainPageViewModel : ViewModelBase
 {
     private FirmwareSourcesProvider fwsProvider = new FirmwareSourcesProvider();
     private object? selectedItem;
+    private ObservableCollection<FirmwareSource>? firmwareSources;
 
     // private FileSystemWatcher watcher;
 
@@ -22,7 +25,11 @@ public class MainPageViewModel : ViewModelBase
     }
 
     public ViewModelBase? FwViewModel { get; set; }
-    public ObservableCollection<FirmwareSource>? FirmwareSources { get; set; }
+    public ObservableCollection<FirmwareSource>? FirmwareSources
+    {
+        get => firmwareSources;
+        set => this.RaiseAndSetIfChanged(ref firmwareSources, value);
+    }
     public object? SelectedItem
     {
         get => null;
@@ -44,5 +51,10 @@ public class MainPageViewModel : ViewModelBase
 
             this.RaisePropertyChanged(nameof(FwViewModel));
         }
+    }
+
+    public void Open()
+    {
+        FirmwareSources = new(fwsProvider.GetSources());
     }
 }
