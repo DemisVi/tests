@@ -36,7 +36,8 @@
             <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" 
               Text="{Binding VersionName}"/>
             <Button HorizontalAlignment="Right" x:CompileBindings="false"
-              Command="{Binding $parent[UserControl].DataContext.RemovePackage}" CommandParameter="{Binding}">
+                Click="RemovePackage_Clicked">
+              <!-- Command="{Binding $parent[UserControl].DataContext.RemovePackage}" CommandParameter="{Binding}" -->
                 Remove
             </Button>
           </Grid>

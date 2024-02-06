@@ -65,14 +65,13 @@ public class FirmwareViewModel : ViewModelBase
                 VersionName = new DirectoryInfo(targetDir).Name,
             });
         }
-
     }
 
-    private async void PerformRemovePackage(Package pack)
+    public /* async */ void PerformRemovePackage(Package pack)
     {
-        var msgBox = MessageBoxManager.GetMessageBoxStandard("Warning", $"Confirm {pack.VersionName} deletion", ButtonEnum.YesNo);
-        var res = await msgBox.ShowAsync();
-        if (pack is not null && res == ButtonResult.Yes)
+        // var msgBox = MessageBoxManager.GetMessageBoxStandard("Warning", $"Confirm {pack.VersionName} deletion", ButtonEnum.YesNo);
+        // var res = await msgBox.ShowAsync();
+        // if (pack is not null && res == ButtonResult.Yes)
         {
             Directory.Delete(pack.PackagePath, true);
             Firmware.Packages?.Remove(pack);
