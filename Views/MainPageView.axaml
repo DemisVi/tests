@@ -10,7 +10,11 @@
   
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,*">
 
-      <Button Grid.Row="0" Margin="10" Command="{Binding Open}">Open</Button>
+      <Button Grid.Row="0" Margin="10" 
+        Click="OpenButton_Clicked">
+        <!-- Command="{Binding Open}" -->
+          Open
+      </Button>
 
       <TreeView Grid.Row="1" ItemsSource="{Binding FirmwareSources}" 
         SelectedItem="{Binding SelectedItem}">
@@ -18,7 +22,10 @@
           <TreeDataTemplate DataType="models:FirmwareSource" ItemsSource="{Binding Firmware}">
             <Grid>
               <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
-              <Button HorizontalAlignment="Right" Margin="10,0">Add Firmware</Button>
+              <Button HorizontalAlignment="Right" Margin="10,0"
+                Click="AddFirmwareButton_Clicked">
+                  Add Firmware
+              </Button>
             </Grid>
           </TreeDataTemplate>
           <TreeDataTemplate DataType="models:Firmware" ItemsSource="{Binding Packages}">

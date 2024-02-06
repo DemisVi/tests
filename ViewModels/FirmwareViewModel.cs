@@ -72,9 +72,14 @@ public class FirmwareViewModel : ViewModelBase
         // var msgBox = MessageBoxManager.GetMessageBoxStandard("Warning", $"Confirm {pack.VersionName} deletion", ButtonEnum.YesNo);
         // var res = await msgBox.ShowAsync();
         // if (pack is not null && res == ButtonResult.Yes)
+        Firmware.Packages?.Remove(pack);
+
+        try
         {
             Directory.Delete(pack.PackagePath, true);
-            Firmware.Packages?.Remove(pack);
+        }
+        catch (DirectoryNotFoundException)
+        {
         }
     }
 }

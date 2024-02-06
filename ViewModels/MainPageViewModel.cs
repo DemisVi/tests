@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using Avalonia.Platform.Storage;
+using DynamicData;
 using Microsoft.VisualBasic;
 using PackageManager.Models;
 using PackageManager.Services;
@@ -21,7 +23,7 @@ public class MainPageViewModel : ViewModelBase
 
     public MainPageViewModel()
     {
-        FirmwareSources = new(fwsProvider.GetSources());
+        // FirmwareSources = new(fwsProvider.GetSources());
     }
 
     public ViewModelBase? FwViewModel { get; set; }
@@ -32,7 +34,7 @@ public class MainPageViewModel : ViewModelBase
     }
     public object? SelectedItem
     {
-        get => null;
+        get => selectedItem;
         set
         {
             selectedItem = value;
@@ -53,8 +55,31 @@ public class MainPageViewModel : ViewModelBase
         }
     }
 
-    public void Open()
+    public void Open(IStorageFolder dir)
     {
-        FirmwareSources = new(fwsProvider.GetSources());
+        FirmwareSources = new(fwsProvider.GetSources(new DirectoryInfo(dir.Path.LocalPath)));
+    }
+
+    public void AddFirmware(IStorageFolder dir, string target)
+    {
+
+        var targetPath = Path.Combine(target, dir.Name);
+        var sourcePath = dir.Path.LocalPath;
+
+        var dirs = Directory.EnumerateDirectories(sourcePath, "*", SearchOption.AllDirectories);
+        var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories);
+
+        foreach (var i in dirs)
+            Directory.CreateDirectory(i.Replace(sourcePath, targetPath));
+
+        foreach (var f in files)
+            File.Copy(f, f.Replace(sourcePath, targetPath), true);
+
+        var fw = FirmwareSources?.SingleOrDefault(x => x.SubfolderName == target);
+        if (fw is not null)
+        {
+            fw.Firmware?.Clear();
+            fw.Firmware?.AddRange(new FirmwareProvider().GetFirmware(fw));
+        }
     }
 }

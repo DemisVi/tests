@@ -7,13 +7,14 @@ using System.Text;
 using System.Text.Json;
 using PackageManager.Models;
 using PackageManager.DataTypes;
+using Avalonia;
 
 namespace PackageManager.Services;
 
 public class FirmwareSourcesProvider
 {
     public static string DefaultFileName { get; } = "Sources.json";
-    public string DefaultSourcesDir { get; set; } = Path.Combine(Environment.CurrentDirectory, DefaultFileName);
+    public string DefaultSourcesPath { get; set; } = Path.Combine(Environment.CurrentDirectory, DefaultFileName);
     public static IEnumerable<FirmwareSource> DefaultSources { get; } = new FirmwareSource[] {
          new()
          {
@@ -42,13 +43,16 @@ public class FirmwareSourcesProvider
             DeviceType = DeviceType.TelitSimple,
         }};
 
-    public IEnumerable<FirmwareSource> GetSources() => GetSources(DefaultSourcesDir);
-    public IEnumerable<FirmwareSource> GetSources(string path)
+    public IEnumerable<FirmwareSource> GetSources() => GetSources(DefaultSourcesPath);
+    public IEnumerable<FirmwareSource> GetSources(DirectoryInfo directory) => GetSources(Path.Combine(directory.FullName, DefaultFileName));
+    public IEnumerable<FirmwareSource> GetSources(string filePath)
     {
-        if (File.Exists(path) is not true)
+        if (File.Exists(filePath) is not true)
         {
+            foreach (var i in DefaultSources)
+                i.SubfolderName = Path.Combine(Path.GetDirectoryName(filePath)!, i.SubfolderName);
             var @default = JsonSerializer.Serialize(DefaultSources);
-            File.WriteAllText(path, @default);
+            File.WriteAllText(filePath, @default);
             return DefaultSources;
         }
         else
@@ -56,9 +60,13 @@ public class FirmwareSourcesProvider
             try
             {
                 var fwProvider = new FirmwareProvider();
-                var src = JsonSerializer.Deserialize<FirmwareSource[]>(File.ReadAllText(path));
+                var src = JsonSerializer.Deserialize<FirmwareSource[]>(File.ReadAllText(filePath));
                 foreach (var i in src!)
+                {
                     i.Firmware = new(fwProvider.GetFirmware(i));
+                    var dir = Path.GetDirectoryName(filePath);
+                    i.SubfolderName = Path.Combine(dir!, i.SubfolderName);
+                }
 
                 return src;
             }
