@@ -26,6 +26,7 @@ public partial class FirmwareView : UserControl
         {
             Title = "Choose package directory",
             AllowMultiple = true,
+            SuggestedStartLocation = TopLevel.GetTopLevel(this)!.StorageProvider.TryGetFolderFromPathAsync("./").Result,
         });
 
         if (DataContext is FirmwareViewModel d)
@@ -41,8 +42,17 @@ public partial class FirmwareView : UserControl
         if (pack is not null && res == ButtonResult.Yes)
         {
             (DataContext as FirmwareViewModel)?.PerformRemovePackage(pack);
-            // Directory.Delete(pack.PackagePath, true);
-            // Firmware.Packages?.Remove(pack);
+        }
+    }
+    private async void ArchivePackage_Clicked(object s, RoutedEventArgs e)
+    {
+        var pack = (s as Button)?.DataContext as Package;
+        var msgBox = MessageBoxManager.GetMessageBoxStandard("Warning", $"Confirm moving {pack?.VersionName} to archive", ButtonEnum.YesNo);
+        var res = await msgBox.ShowWindowDialogAsync(this.FindAncestorOfType<Window>());
+
+        if (pack is not null && res == ButtonResult.Yes)
+        {
+            (DataContext as FirmwareViewModel)?.PerformArchivePackage(pack);
         }
     }
 }

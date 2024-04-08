@@ -23,7 +23,25 @@ public class MainPageViewModel : ViewModelBase
 
     public MainPageViewModel()
     {
-        // FirmwareSources = new(fwsProvider.GetSources());
+        var directories = Directory.GetDirectories("C:\\");
+        var file = string.Empty;
+
+        foreach (var i in directories)
+        {
+            try
+            {
+                file = Directory.GetFiles(i, "Sources.json")[0];
+                break;
+            }
+            catch (Exception) { }
+        }
+
+        try
+        {
+            FirmwareSources = new(fwsProvider.GetSources(file));
+        }
+        catch (Exception)
+        { }
     }
 
     public ViewModelBase? FwViewModel { get; set; }

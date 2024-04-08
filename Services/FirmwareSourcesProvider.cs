@@ -41,6 +41,11 @@ public class FirmwareSourcesProvider
             Name = "Telit Упрощенный",
             SubfolderName = "./Telit_simple",
             DeviceType = DeviceType.TelitSimple,
+        },
+        new() {
+            Name = "SimCom Технолабс",
+            SubfolderName = "./SimCom_techno",
+            DeviceType = DeviceType.SimComTechno,
         }};
 
     public IEnumerable<FirmwareSource> GetSources() => GetSources(DefaultSourcesPath);

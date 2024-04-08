@@ -32,15 +32,17 @@
       ItemsSource="{Binding Firmware.Packages}">
       <ListBox.ItemTemplate>
         <DataTemplate>
-          <Grid>
+          <DockPanel>
             <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" 
-              Text="{Binding VersionName}"/>
+                DockPanel.Dock="Left"
+                Text="{Binding VersionName}"/>
             <Button HorizontalAlignment="Right" x:CompileBindings="false"
-                Click="RemovePackage_Clicked">
-              <!-- Command="{Binding $parent[UserControl].DataContext.RemovePackage}" CommandParameter="{Binding}" -->
-                Remove
-            </Button>
-          </Grid>
+                DockPanel.Dock="Right"  Content="Remove"
+                Click="RemovePackage_Clicked"/>
+            <Button HorizontalAlignment="Right" x:CompileBindings="false"
+                DockPanel.Dock="Right"  Content="Archive"
+                Click="ArchivePackage_Clicked"/>
+          </DockPanel>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
