@@ -6,6 +6,6 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PackageManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/NewImage-1.ico"
         Title="PackageManager"
         Content="{Binding model}"/>

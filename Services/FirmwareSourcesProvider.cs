@@ -58,7 +58,7 @@ public class FirmwareSourcesProvider
                 i.SubfolderName = Path.Combine(Path.GetDirectoryName(filePath)!, i.SubfolderName);
             var @default = JsonSerializer.Serialize(DefaultSources);
             File.WriteAllText(filePath, @default);
-            return DefaultSources;
+            return GetSources(filePath);
         }
         else
         {
